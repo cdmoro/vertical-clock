@@ -7,7 +7,88 @@
     <title>vertical-clock</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div class="actions">
+      <button id="toggle-format">Switch to 12-hour</button>
+      <button id="theme-btn">Use dark theme</button>
+      <select id="variant-select">
+        <option value="default">Default</option>
+        <option value="cards">Cards</option>
+        <option value="cogs">Cogs</option>
+        <option value="cylinder">Cylinder</option>
+        <option value="iphone">iPhone</option>
+        <option value="photos">Photos</option>
+        <option value="caterpillars">Caterpillars</option>
+      </select>
+    </div>
+
+    <div class="wrapper">
+      <div class="clock">
+        <div class="col digit">
+          <span><span>0</span></span>
+          <span><span>1</span></span>
+          <span><span>2</span></span>
+        </div>
+        <div class="col digit">
+          <span><span>0</span></span>
+          <span><span>1</span></span>
+          <span><span>2</span></span>
+          <span><span>3</span></span>
+          <span><span>4</span></span>
+          <span><span>5</span></span>
+          <span><span>6</span></span>
+          <span><span>7</span></span>
+          <span><span>8</span></span>
+          <span><span>9</span></span>
+        </div>
+        <div class="spacer"></div>
+        <div class="col digit">
+          <span><span>0</span></span>
+          <span><span>1</span></span>
+          <span><span>2</span></span>
+          <span><span>3</span></span>
+          <span><span>4</span></span>
+          <span><span>5</span></span>
+        </div>
+        <div class="col digit">
+          <span><span>0</span></span>
+          <span><span>1</span></span>
+          <span><span>2</span></span>
+          <span><span>3</span></span>
+          <span><span>4</span></span>
+          <span><span>5</span></span>
+          <span><span>6</span></span>
+          <span><span>7</span></span>
+          <span><span>8</span></span>
+          <span><span>9</span></span>
+        </div>
+        <div class="spacer"></div>
+        <div class="col digit">
+          <span><span>0</span></span>
+          <span><span>1</span></span>
+          <span><span>2</span></span>
+          <span><span>3</span></span>
+          <span><span>4</span></span>
+          <span><span>5</span></span>
+        </div>
+        <div class="col digit">
+          <span><span>0</span></span>
+          <span><span>1</span></span>
+          <span><span>2</span></span>
+          <span><span>3</span></span>
+          <span><span>4</span></span>
+          <span><span>5</span></span>
+          <span><span>6</span></span>
+          <span><span>7</span></span>
+          <span><span>8</span></span>
+          <span><span>9</span></span>
+        </div>
+        <div class="spacer format-spacer"></div>
+        <div class="col format">
+          <span><span>AM</span></span>
+          <span><span>PM</span></span>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
