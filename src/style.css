@@ -1,15 +1,20 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jaini&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap");
 
 :root {
-  --accent-color: #ffaacc;
+  --accent-color-rgb: 255, 170, 204;
+  --accent-color: rgb(var(--accent-color-rgb));
+  --foreground-accent-color: #eee;
   --background: #eee;
   --color: #333;
+  --clock-height: 70px;
+  --digit-width: 60px;
 }
 
 [data-theme="dark"] {
-  --background: #333;
+  --background: #222;
   --color: #fff;
 }
 
@@ -18,6 +23,7 @@ body {
   font-family: "Space Mono", monospace;
   background: var(--background);
   color: var(--color);
+  transition: background 0.5s ease;
 }
 
 .wrapper {
@@ -26,37 +32,40 @@ body {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  transition: all 0.5s ease;
 }
 
 .clock {
   display: grid;
-  grid-template-columns: auto auto auto auto auto auto auto auto;
+  grid-template-columns: repeat(8, auto);
   gap: 0.3rem;
   align-items: flex-start;
-  height: 50px;
+  height: var(--clock-height);
   border-radius: 0.25rem;
   padding: 0 0.3rem;
+  background: var(--clock-background);
 }
 
 [data-format="12"] .clock {
-  grid-template-columns: auto auto auto auto auto auto auto auto auto auto;
+  grid-template-columns: repeat(10, auto);
 }
 
 .col {
   display: flex;
   flex-direction: column;
-  border: solid 1px #ffaaccaa;
+  border: solid 1px var(--accent-color);
   border-radius: 0.25rem;
   transition: transform 0.5s ease;
 }
 
 .col > span {
-  width: 40px;
-  height: 50px;
+  width: var(--digit-width);
+  height: var(--clock-height);
   display: flex;
   justify-content: center;
   align-items: center;
   transition: all 1s ease;
+  container-type: size;
 }
 
 .col span span {
@@ -65,10 +74,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #ffaacc22;
+  background: rgba(var(--accent-color-rgb), 0.1);
   color: #0008;
   position: relative;
   transition: all 1s ease;
+  font-size: 40cqmin;
 }
 
 .col > span.active span {
@@ -77,11 +87,12 @@ body {
 }
 
 .spacer {
-  width: 0.1rem;
+  width: 0.2rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 50px;
+  height: var(--clock-height);
+  color: transparent;
 }
 
 [data-format="24"] .format-spacer {
@@ -100,27 +111,72 @@ body {
   position: absolute;
   padding: 0.5rem;
   z-index: 10;
+  display: flex;
+  gap: .5rem;
 }
 
 .actions button,
-.actions select {
+.actions select,
+.actions input[type="color"] {
   background: var(--accent-color);
   border: solid 1px var(--accent-color);
   border-radius: 0.25rem;
   padding: 0.3rem 0.5rem;
   cursor: pointer;
   transition: all 0.5s ease;
+  color: var(--foreground-accent-color);
+}
+
+.actions input[type="color"] {
+  background-color: var(--background);
+  height: 29px;
+  width: 29px;
+  padding: 0px 2px;
+
+  &::-moz-color-swatch {
+    border: 0 !important;
+    border-radius: 50%;
+  }
+
+  &::-webkit-color-swatch {
+    border: 0 !important;
+    border-radius: 50%;
+  }
+}
+
+.actions .color-control {
+  display: inline-flex;
+}
+
+.actions .color-control input,
+.actions .color-control button {
+  border-radius: 0;
+}
+
+.actions .color-control input.single {
+  border-radius: 0.25rem;
+}
+
+.actions .color-control *:first-child {
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.actions .color-control *:last-child {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+[data-variant="default"] {
+  .col > span.active span {
+    color: var(--foreground-accent-color);
+  }
 }
 
 /* VARIANTS */
 
 [data-variant="cards"] {
-  .actions button,
-  .actions select {
-    background: #444cf7;
-    border-color: #444cf7;
-    color: #fff;
-  }
+  --digit-width: 55px;
 
   .clock .col {
     border: none;
@@ -133,21 +189,26 @@ body {
   }
 
   .clock .col span span {
-    height: 46px;
+    height: 65px;
     border: solid 1px #111;
     border-radius: 0.25rem;
     transform: rotatey(180deg);
     background-color: #e5e5f7;
     color: transparent;
     opacity: 0.7;
-    background-image: linear-gradient(135deg, #444cf7 25%, transparent 25%),
-      linear-gradient(225deg, #444cf7 25%, transparent 25%),
-      linear-gradient(45deg, #444cf7 25%, transparent 25%),
-      linear-gradient(315deg, #444cf7 25%, #e5e5f7 25%);
-    background-position: 10px 0, 10px 0, 0 0, 0 0;
+    background-image:
+      linear-gradient(135deg, var(--accent-color) 25%, transparent 25%),
+      linear-gradient(225deg, var(--accent-color) 25%, transparent 25%),
+      linear-gradient(45deg, var(--accent-color) 25%, transparent 25%),
+      linear-gradient(315deg, var(--accent-color) 25%, #e5e5f7 25%);
+    background-position:
+      10px 0,
+      10px 0,
+      0 0,
+      0 0;
     background-size: 5px 5px;
     background-repeat: repeat;
-    font-size: 1.4rem;
+    font-size: 60cqmin;
     /*     transition: transform 0.2s ease; */
   }
 
@@ -158,7 +219,7 @@ body {
 
   .clock span.active span:before,
   .clock span.active span:after {
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     position: absolute;
   }
 
@@ -225,7 +286,8 @@ body {
 
 @keyframes flip {
   0% {
-    background-image: linear-gradient(135deg, #444cf7 25%, transparent 25%),
+    background-image:
+      linear-gradient(135deg, #444cf7 25%, transparent 25%),
       linear-gradient(225deg, #444cf7 25%, transparent 25%),
       linear-gradient(45deg, #444cf7 25%, transparent 25%),
       linear-gradient(315deg, #444cf7 25%, #e5e5f7 25%);
@@ -242,11 +304,8 @@ body {
 }
 
 [data-variant="cogs"] {
-  .actions button,
-  .actions select {
-    background: lightgrey;
-    border-color: lightgrey;
-  }
+  --secondary-color: color-mix(in srgb, var(--accent-color), white 20%);
+  --tertiary-color: color-mix(in srgb, var(--accent-color), white 5%);
 
   .clock {
     font-size: 1.2rem;
@@ -262,13 +321,13 @@ body {
   }
 
   .col span span {
-    height: 35px;
-    width: 35px;
+    height: 50px;
+    width: 50px;
     transform: rotate(calc(var(--pos) * -50deg));
-    background: #666;
+    background: var(--tertiary-color);
     border-radius: 0.25rem;
     transition: transform 0.5s ease;
-    color: #555;
+    color: #555A;
   }
 
   .col span.active {
@@ -280,8 +339,8 @@ body {
   }
 
   .col span.active span {
-    background: #aaa;
-    color: #333;
+    background: var(--secondary-color);
+    color: var(--foreground-accent-color)
   }
 
   .col span span:after,
@@ -289,34 +348,35 @@ body {
     content: "";
     position: absolute;
     z-index: -1;
-
     border-radius: 0.25rem;
   }
 
   .col span span:after {
     border-radius: 50%;
-    background: #777;
-    width: 30px;
-    height: 30px;
+    background: var(--secondary-color);
+    width: 45px;
+    height: 45px;
   }
 
   .col span.active span:after {
-    background: grey;
+    background: var(--accent-color);
   }
 
   .col span span:before {
     transform: rotate(45deg);
-    background: #666;
-    height: 35px;
-    width: 35px;
+    background: var(--tertiary-color);
+    height: 50px;
+    width: 50px;
   }
 
   .col span.active span:before {
-    background: #aaa;
+    background: var(--secondary-color);
   }
 }
 
 [data-variant="cylinder"] {
+  --secondary-color: color-mix(in srgb, var(--accent-color), black 20%);
+
   .col {
     border: none;
     transition-duration: 0.2s;
@@ -327,11 +387,13 @@ body {
   }
 
   .col span span {
-    background: #795d68;
+    background: var(--secondary-color);
+    color: color-mix(in srgb, var(--foreground-accent-color), black 70%);
   }
 
   .col span.active span {
-    background: pink;
+    background: var(--accent-color);
+    color: var(--foreground-accent-color);
   }
 
   .col span[data-pos="-1"],
@@ -346,7 +408,7 @@ body {
   }
 
   .col span[data-pos="1"] span {
-    background: linear-gradient(180deg, #795d68 0%, rgba(0, 0, 0, 0.4) 100%);
+    background: linear-gradient(180deg, var(--secondary-color) 0%, rgba(0, 0, 0, 0.4) 100%);
   }
 
   .col span[data-pos="-1"] {
@@ -355,7 +417,7 @@ body {
   }
 
   .col span[data-pos="-1"] span {
-    background: linear-gradient(0deg, #795d68 0%, rgba(0, 0, 0, 0.4) 100%);
+    background: linear-gradient(0deg, var(--secondary-color) 0%, rgba(0, 0, 0, 0.4) 100%);
   }
 
   .col span[data-pos="2"] {
@@ -368,21 +430,21 @@ body {
 
   .col span.active span::after {
     content: "";
-    height: 29px;
-    background: linear-gradient(180deg, #795d68 0%, rgba(0, 0, 0, 0.4) 100%);
+    height: 43px;
+    background: linear-gradient(180deg, var(--secondary-color) 0%, rgba(0, 0, 0, 0.4) 100%);
     position: absolute;
-    bottom: -28px;
-    width: 40px;
+    bottom: -43px;
+    width: 60px;
     z-index: 0;
   }
 
   .col span.active span::before {
     content: "";
-    height: 29px;
-    background: linear-gradient(0deg, #795d68 0%, rgba(0, 0, 0, 0.4) 100%);
+    height: 43px;
+    background: linear-gradient(0deg, var(--secondary-color) 0%, rgba(0, 0, 0, 0.4) 100%);
     position: absolute;
-    top: -28px;
-    width: 40px;
+    top: -43px;
+    width: 60px;
     z-index: 0;
   }
 }
@@ -393,9 +455,8 @@ body {
   }
 
   .col > span > span {
-    /*     background: none; */
-    width: 25px;
-    height: 40px;
+    width: 40px;
+    height: 60px;
     border-radius: 0.25rem;
     border: solid 1px #000;
     transform: translatex(calc(var(--n-factor) * 2px))
@@ -403,7 +464,7 @@ body {
       rotate(calc(var(--n-factor) * 3deg));
     background: hsl(
       calc(var(--factor) * 50),
-      calc(var(--factor) * 50%),
+      calc(var(--factor) * 90%),
       50%,
       0.8
     );
@@ -442,7 +503,7 @@ body {
   }
 }
 
-[data-variant="photos"] {
+[data-variant="memories"] {
   .col {
     border: none;
   }
@@ -452,9 +513,9 @@ body {
     font-size: 1.5rem;
     background-image: var(--photo), url("https://picsum.photos/id/27/50");
     background-color: grey;
-    height: 35px;
-    border: solid 2px #fff;
-    border-bottom-width: 9px;
+    height: 50px;
+    border: solid 3px #fff;
+    border-bottom-width: 24cqmin;
     transform: translatex(calc(var(--n-factor) * 40px))
       translatey(calc(var(--n-factor) * 2px))
       rotate(calc(var(--n-factor) * 10deg));
@@ -472,13 +533,12 @@ body {
     width: 30px;
     overflow: hidden;
     transform: rotate(calc(var(--n-factor) * 5deg))
-      translatey(calc(var(--n-factor) * 1.5 * 1px))
-      translatex(calc(var(--n-factor) * 2 * 1px))
-      scale(calc(var(--n-factor) * 1.2));
+      translatey(calc(var(--n-factor) * 2px))
+      translatex(calc(var(--n-factor) * 2px)) scale(calc(var(--n-factor) * 1.5));
   }
 
   .col > span.active > span {
-    color: #fff;
+    color: var(--accent-color);
     z-index: 2;
     background-blend-mode: color-burn;
     transform: translatex(0) translatey(calc(var(--n-factor) * 6px))
@@ -499,7 +559,7 @@ body {
     border-radius: 50%;
     height: 55px;
     width: 55px;
-    background: #a9c55d;
+    background: color-mix(in srgb, var(--accent-color), white 40%);
     font-size: 1.4rem;
     transform: translatex(calc(var(--n-factor) * 10px))
       translatey(calc(var(--n-factor) * 2px))
@@ -534,7 +594,8 @@ body {
   }
 
   .col span.active span {
-    background: #698744;
+    background: var(--accent-color);
+    color: var(--foreground-accent-color);
     transform: none;
   }
 
@@ -555,16 +616,78 @@ body {
     top: -10px;
     transform: rotate(160deg);
   }
-  
-   .col > span:nth-last-child(2) {
-    transform: translatey(-5px) scale(.9);
+
+  .col > span:nth-last-child(2) {
+    transform: translatey(-5px) scale(0.9);
   }
-  
+
   .col > span:last-child {
-    transform: translatey(-15px) scale(.8);
+    transform: translatey(-15px) scale(0.8);
   }
-  
+
   .col > span.active {
     transform: none !important;
+  }
+}
+
+[data-variant="photo"][data-theme="dark"] {
+  --clock-background: rgba(0, 0, 0, 0.6);
+
+  .wrapper {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .clock span.active span {
+    text-shadow: 0px 0px 25px #1c1c1c;
+  }
+}
+
+[data-variant="photo"] {
+  --clock-background: rgba(255, 255, 255, 0.8);
+  --clock-height: 95px;
+  --digit-width: 50px;
+
+  body {
+    background-image: var(--background-image);
+    background-size: cover;
+    background-position: center;
+  }
+
+  .wrapper {
+    background: #0000002c;
+  }
+
+  .clock {
+    font-family: "Abril Fatface", serif;
+    gap: 0;
+    padding: 0 1rem;
+  }
+
+  .clock .col {
+    border: none;
+  }
+
+  .clock span span {
+    background: none;
+    font-size: 160cqmin;
+  }
+
+  .clock span.active span {
+    color: var(--accent-color);
+    text-shadow: 0px 0px 25px #ffffff;
+  }
+
+  .clock .spacer {
+    width: 2rem;
+    color: rgba(var(--accent-color-rgb), 0.2);
+    font-size: 8.5cqmin;
+  }
+
+  .clock .format > span {
+    width: 112px;
+  }
+
+  .clock .format span span {
+    font-size: 80cqmin;
   }
 }

@@ -1,17 +1,24 @@
 import "./style.css";
 
-const HEIGHT = 50;
 let FORMAT = 24;
-
 const formatEl = document.querySelector<HTMLDivElement>(".clock .format")!;
-const formats = document.querySelectorAll<HTMLSpanElement>(".clock .format > span")!;
-const toggleFormatBtn = document.querySelector<HTMLButtonElement>("#toggle-format")!;
+const formats = document.querySelectorAll<HTMLSpanElement>(
+  ".clock .format > span",
+)!;
+const toggleFormatBtn =
+  document.querySelector<HTMLButtonElement>("#toggle-format")!;
 const toggleThemeBtn = document.querySelector<HTMLButtonElement>("#theme-btn")!;
-const variantSelectEl = document.querySelector<HTMLSelectElement>("#variant-select")!;
+const variantSelectEl =
+  document.querySelector<HTMLSelectElement>("#variant-select")!;
+const resetColorBtn =
+  document.querySelector<HTMLButtonElement>("#reset-color")!;
+const colorPickerEl =
+  document.querySelector<HTMLInputElement>("#color-picker")!;
 const digits = [...document.querySelectorAll<HTMLDivElement>(".clock .digit")];
+let forceUpdatePhoto = false;
 
 const numbersCache = digits.map((d) => [
-  ...d.querySelectorAll<HTMLSpanElement>(":scope > span")
+  ...d.querySelectorAll<HTMLSpanElement>(":scope > span"),
 ]);
 let prevTime: number[] | null = null;
 let prevPeriod: number | null = null;
@@ -20,6 +27,15 @@ function randomIntFromInterval(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+const THEME_COLORS = {
+  default: "#ffaacc",
+  cards: "#444cf7",
+  cogs: "#808080",
+  cylinder: "#d72d71",
+  memories: "#00eb27",
+  caterpillars: "#698744",
+  photo: "#fd3622",
+};
 
 function startTime() {
   const today = new Date();
@@ -29,17 +45,23 @@ function startTime() {
     const period = h >= 12 ? 1 : 0;
 
     if (prevPeriod !== period) {
-      formats.forEach(n => n.classList.remove("active"));
+      formats.forEach((n) => n.classList.remove("active"));
       formats[period].classList.add("active");
 
-      formatEl.style.transform = `translatey(-${HEIGHT * period + 1}px)`;
-      formatEl.style.setProperty("--factor", ((Math.random() - 0.5) * 2).toFixed(2));
+      formatEl.style.transform = `translatey(calc(var(--clock-height) * -${period} + 1px))`;
+      formatEl.style.setProperty(
+        "--factor",
+        ((Math.random() - 0.5) * 2).toFixed(2),
+      );
 
       let formatPos = period * -1;
 
-      formats.forEach(f => {
+      formats.forEach((f) => {
         f.style.setProperty("--pos", formatPos.toString());
-        f.style.setProperty("--n-factor", ((Math.random() - 0.5) * 2).toFixed(2));
+        f.style.setProperty(
+          "--n-factor",
+          ((Math.random() - 0.5) * 2).toFixed(2),
+        );
         f.dataset.pos = formatPos.toString();
         formatPos++;
       });
@@ -56,13 +78,34 @@ function startTime() {
     Math.floor(today.getMinutes() / 10),
     today.getMinutes() % 10,
     Math.floor(today.getSeconds() / 10),
-    today.getSeconds() % 10
+    today.getSeconds() % 10,
   ];
+
+  const periodStr = FORMAT === 12 ? (prevPeriod === 0 ? " am" : " pm") : "";
+
+  if (
+    variantSelectEl.value === "photo" &&
+    (prevTime?.[3] !== newTime[3] || forceUpdatePhoto)
+  ) {
+    document.documentElement.style.setProperty(
+      "--background-image",
+      `url("https://picsum.photos/seed/${newTime.join("")}${periodStr}/1294/965")`,
+    );
+    forceUpdatePhoto = false;
+  } else if (variantSelectEl.value !== "photo") {
+    document.documentElement.style.removeProperty("--background-image");
+  }
+
+  document.title = `${newTime[0]}${newTime[1]}:${newTime[2]}${newTime[3]}${periodStr} - Vertical Clock`;
 
   newTime.forEach((d, i) => {
     if (!prevTime || prevTime[i] !== d) {
-      digits[i].style.transform = `translatey(-${HEIGHT * d + 1}px)`;
-      digits[i].style.setProperty("--factor", ((Math.random() - 0.5) * 2).toFixed(2));
+      digits[i].style.transform =
+        `translatey(calc(var(--clock-height) * -${d} + 1px))`;
+      digits[i].style.setProperty(
+        "--factor",
+        ((Math.random() - 0.5) * 2).toFixed(2),
+      );
 
       if (prevTime) {
         numbersCache[i][prevTime[i]].classList.remove("active");
@@ -72,7 +115,7 @@ function startTime() {
 
       let pos = d * -1;
 
-      numbersCache[i].forEach(num => {
+      numbersCache[i].forEach((num) => {
         num.style.setProperty("--pos", pos.toString());
         // num.style.setProperty("--n-factor", ((Math.random() - 0.5) * 2).toFixed(2));
         num.dataset.pos = pos.toString();
@@ -87,57 +130,115 @@ function startTime() {
 function setFormat(newFormat: string) {
   FORMAT = parseInt(newFormat);
   prevPeriod = null;
-  // prevTime = null;
   document.documentElement.dataset.format = newFormat;
-  toggleFormatBtn.innerText =
-    FORMAT === 12 ? "Switch to 24-hour" : "Switch to 12-hour";
+  toggleFormatBtn.innerText = FORMAT === 12 ? "24" : "12";
+  toggleFormatBtn.title = `Switch to ${FORMAT === 12 ? "24" : "12"}-hour format`;
   localStorage.setItem("format", newFormat);
 }
 
-function setPhotos() {
-  document.querySelectorAll<HTMLSpanElement>(".col > span > span").forEach(el => el.style.setProperty("--photo", `url("https://picsum.photos/id/${randomIntFromInterval(1,600)}/50")`))
+function setMemories() {
+  document
+    .querySelectorAll<HTMLSpanElement>(".col > span > span")
+    .forEach((el) =>
+      el.style.setProperty(
+        "--photo",
+        `url("https://picsum.photos/id/${randomIntFromInterval(1, 600)}/50")`,
+      ),
+    );
 }
 
-function setTheme(theme: string) {
-    toggleThemeBtn.innerText = `Use ${theme === "light" ? "dark" : "light"} theme`;
-  document.documentElement.dataset.theme = theme;
-  localStorage.setItem("theme", theme);
+function setTheme(newTheme: string) {
+  toggleThemeBtn.innerText = `${newTheme === "light" ? "Dark" : "Light"}`;
+  document.documentElement.dataset.theme = newTheme;
+  localStorage.setItem("theme", newTheme);
 }
 
-function setVariant(variant: string) {
-  document.documentElement.dataset.variant = variant;
-  variantSelectEl.value = variant;
-  localStorage.setItem("variant", variant);
-  
-  if (variant === "photos") {
-    setPhotos();
+function setVariant(newVariant: string) {
+  document.documentElement.dataset.variant = newVariant;
+  variantSelectEl.value = newVariant;
+  localStorage.setItem("variant", newVariant);
+
+  const color = THEME_COLORS[newVariant as keyof typeof THEME_COLORS];
+
+  if (color) {
+    setColor(color);
+  }
+
+  if (newVariant === "memories") {
+    setMemories();
+  }
+
+  if (newVariant === "photo") {
+    forceUpdatePhoto = true;
   }
 }
 
-(function main() {
+function hexToRgb(hex: string) {
+  const bigint = parseInt(hex.slice(1), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `${r}, ${g}, ${b}`;
+}
+
+function getForegroundColor(color: string) {
+  const rgb = hexToRgb(color)
+    .split(",")
+    .map((c) => parseInt(c.trim()));
+  const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+  return brightness > 125 ? "#333" : "#eee";
+}
+
+function setColor(newColor: string) {
+  document.documentElement.style.setProperty(
+    "--accent-color-rgb",
+    hexToRgb(newColor),
+  );
+  document.documentElement.style.setProperty(
+    "--foreground-accent-color",
+    getForegroundColor(newColor),
+  );
+  colorPickerEl.value = newColor;
+  localStorage.setItem("color", newColor);
+
+  if (
+    colorPickerEl.value !==
+    THEME_COLORS[variantSelectEl.value as keyof typeof THEME_COLORS]
+  ) {
+    colorPickerEl.classList.remove("single");
+    resetColorBtn.style.display = "inline-block";
+  } else {
+    colorPickerEl.classList.add("single");
+    resetColorBtn.style.display = "none";
+  }
+}
+
+function main() {
   const savedFormat = localStorage.getItem("format") || "24";
   const savedTheme = localStorage.getItem("theme") || "light";
   const savedVariant = localStorage.getItem("variant") || "default";
+  const savedColor = localStorage.getItem("color") || "#ffaacc";
 
   setFormat(savedFormat);
   setTheme(savedTheme);
   setVariant(savedVariant);
-  
-  numbersCache.forEach(digit => {
-  digit.forEach(num => {
-    num.style.setProperty(
-      "--n-factor",
-      ((Math.random() - 0.5) * 2).toFixed(2)
-    );
-  });
-});
+  setColor(savedColor);
 
+  numbersCache.forEach((digit) => {
+    digit.forEach((num) => {
+      num.style.setProperty(
+        "--n-factor",
+        ((Math.random() - 0.5) * 2).toFixed(2),
+      );
+    });
+  });
 
   startTime();
   setInterval(startTime, 1000);
-  
+
   toggleThemeBtn.addEventListener("click", () => {
-    const newTheme = document.documentElement.dataset.theme === "light" ? "dark" : "light";   
+    const newTheme =
+      document.documentElement.dataset.theme === "light" ? "dark" : "light";
     setTheme(newTheme);
   });
 
@@ -151,5 +252,20 @@ function setVariant(variant: string) {
     setFormat(newFormat);
   });
 
-  variantSelectEl.addEventListener("input", (e) => setVariant((e.target as HTMLSelectElement).value));
-})();
+  resetColorBtn.addEventListener("click", () => {
+    const theme = document.documentElement.dataset.variant || "default";
+    if (theme in THEME_COLORS) {
+      setColor(THEME_COLORS[theme as keyof typeof THEME_COLORS]);
+    }
+  });
+
+  variantSelectEl.addEventListener("input", (e) =>
+    setVariant((e.target as HTMLSelectElement).value),
+  );
+
+  colorPickerEl.addEventListener("input", (e) => {
+    setColor((e.target as HTMLInputElement).value);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", main);
