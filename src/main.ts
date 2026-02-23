@@ -1,4 +1,5 @@
 import "./style.css";
+import { updateFavicon } from "./utils";
 
 let FORMAT = 24;
 const formatEl = document.querySelector<HTMLDivElement>(".clock .format")!;
@@ -32,7 +33,7 @@ const THEME_COLORS = {
   cards: "#444cf7",
   cogs: "#808080",
   cylinder: "#d72d71",
-  memories: "#00eb27",
+  memories: "#ffffff",
   caterpillars: "#698744",
   photo: "#fd3622",
 };
@@ -82,14 +83,19 @@ function startTime() {
   ];
 
   const periodStr = FORMAT === 12 ? (prevPeriod === 0 ? " am" : " pm") : "";
+  const isNewMinute = prevTime?.[3] !== newTime[3];
+
+  if (isNewMinute) {
+    updateFavicon();
+  }
 
   if (
     variantSelectEl.value === "photo" &&
-    (prevTime?.[3] !== newTime[3] || forceUpdatePhoto)
+    (isNewMinute || forceUpdatePhoto)
   ) {
     document.documentElement.style.setProperty(
       "--background-image",
-      `url("https://picsum.photos/seed/${newTime.join("")}${periodStr}/1294/965")`,
+      `url("https://picsum.photos/seed/${newTime.join("")}${periodStr.trim()}/1294/965")`,
     );
     forceUpdatePhoto = false;
   } else if (variantSelectEl.value !== "photo") {
