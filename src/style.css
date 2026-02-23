@@ -146,18 +146,18 @@ body {
 
 .actions input[type="color"] {
   background-color: var(--background);
-  height: 29px;
-  width: 29px;
-  padding: 0px 2px;
+  height: 30px;
+  width: 35px;
+  padding: .375rem;
 
   &::-moz-color-swatch {
     border: 0 !important;
-    border-radius: 50%;
+    border-radius: .375rem;
   }
 
   &::-webkit-color-swatch {
     border: 0 !important;
-    border-radius: 50%;
+    border-radius: .375rem;
   }
 }
 
