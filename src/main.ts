@@ -8,13 +8,15 @@ const formats = document.querySelectorAll<HTMLSpanElement>(
 )!;
 const toggleFormatBtn =
   document.querySelector<HTMLButtonElement>("#toggle-format")!;
-const toggleThemeBtn = document.querySelector<HTMLButtonElement>("#theme-btn")!;
+const themeSelectEl = document.querySelector<HTMLSelectElement>("#theme-select")!;
 const variantSelectEl =
   document.querySelector<HTMLSelectElement>("#variant-select")!;
 const resetColorBtn =
   document.querySelector<HTMLButtonElement>("#reset-color")!;
 const colorPickerEl =
   document.querySelector<HTMLInputElement>("#color-picker")!;
+const languageSelectEl =
+  document.querySelector<HTMLSelectElement>("#language-select")!;
 const digits = [...document.querySelectorAll<HTMLDivElement>(".clock .digit")];
 let forceUpdatePhoto = false;
 
@@ -23,6 +25,262 @@ const numbersCache = digits.map((d) => [
 ]);
 let prevTime: number[] | null = null;
 let prevPeriod: number | null = null;
+const RTL_LOCALES = ["ar"];
+let mouseTimeout: number | undefined;
+
+type Language = "en" | "es" | "it" | "fr" | "pt" | "de" | "ch" | "gr" | "ar";
+
+type NumberToWords = {
+  [key in Language]: Record<string, string>;
+};
+
+type Theme = "light" | "dark" | "auto";
+
+const TRANSLATIONS: NumberToWords = {
+  en: {
+    0: "zero",
+    1: "one",
+    2: "two",
+    3: "three",
+    4: "four",
+    5: "five",
+    6: "six",
+    7: "seven",
+    8: "eight",
+    9: "nine",
+    am: "am",
+    pm: "pm",
+    auto: "Auto",
+    light: "Light",
+    dark: "Dark",
+    default: "Default",
+    cards: "Cards",
+    cogs: "Cogs",
+    cylinder: "Cylinder",
+    memories: "Memories",
+    caterpillars: "Caterpillars",
+    photo: "Photo",
+    words: "Words",
+    reset: "Reset",
+    made_by: "Made by"
+  },
+  es: {
+    0: "cero",
+    1: "uno",
+    2: "dos",
+    3: "tres",
+    4: "cuatro",
+    5: "cinco",
+    6: "seis",
+    7: "siete",
+    8: "ocho",
+    9: "nueve",
+    am: "am",
+    pm: "pm",
+    auto: "auto",
+    light: "Claro",
+    dark: "Oscuro",
+    default: "Base",
+    cards: "Tarjetas",
+    cogs: "Engranajes",
+    cylinder: "Cilindro",
+    memories: "Recuerdos",
+    caterpillars: "Orugas",
+    photo: "Foto",
+    words: "Palabras",
+    reset: "Restablecer",
+    made_by: "Hecho por"
+  },
+  it:  {
+    0: "zero",
+    1: "uno",
+    2: "due",
+    3: "tre",
+    4: "quattro",
+    5: "cinque",
+    6: "sei",
+    7: "sette",
+    8: "otto",
+    9: "nove",
+    am: "am",
+    pm: "pm",
+    auto: "Auto",
+    light: "Chiaro",
+    dark: "Scuro",
+    default: "Predefinito",
+    cards: "Carte",
+    cogs: "Ingranaggi",
+    cylinder: "Cilindro",
+    memories: "Ricordi",
+    caterpillars: "Bruchi",
+    photo: "Foto",
+    words: "Parole",
+    reset: "Reimposta",
+    made_by: "Realizzato da"
+  },
+  fr: {
+    0: "zéro",
+    1: "un",
+    2: "deux",
+    3: "trois",
+    4: "quatre",
+    5: "cinq",
+    6: "six",
+    7: "sept",
+    8: "huit",
+    9: "neuf",
+    am: "am",
+    pm: "pm",
+    auto: "Auto",
+    light: "Clair",
+    dark: "Sombre",
+    default: "Par défaut",
+    cards: "Cartes",
+    cogs: "Engrenages",
+    cylinder: "Cylindre",
+    memories: "Souvenirs",
+    caterpillars: "Chenilles",
+    photo: "Photo",
+    words: "Mots",
+    reset: "Réinitialiser",
+    made_by: "Fait par"
+  },
+  pt: {
+    0: "zero",
+    1: "um",
+    2: "dois",
+    3: "três",
+    4: "quatro",
+    5: "cinco",
+    6: "seis",
+    7: "sete",
+    8: "oito",
+    9: "nove",
+    am: "am",
+    pm: "pm",
+    auto: "Auto",
+    light: "Claro",
+    dark: "Escuro",
+    default: "Padrão",
+    cards: "Cartas",
+    cogs: "Engrenagens",
+    cylinder: "Cilindro",
+    memories: "Memórias",
+    caterpillars: "Lagartas",
+    photo: "Foto",
+    words: "Palavras",
+    reset: "Redefinir",
+    made_by: "Feito por"
+  },
+  de: {
+    0: "null",
+    1: "eins",
+    2: "zwei",
+    3: "drei",
+    4: "vier",
+    5: "fünf",
+    6: "sechs",
+    7: "sieben",
+    8: "acht",
+    9: "neun",
+    am: "am",
+    pm: "pm",
+    auto: "Auto",
+    light: "Hell",
+    dark: "Dunkel",
+    default: "Standard",
+    cards: "Karten",
+    cogs: "Zahnräder",
+    cylinder: "Zylinder",
+    memories: "Erinnerungen",
+    caterpillars: "Raupen",
+    photo: "Foto",
+    words: "Wörter",
+    reset: "Zurücksetzen",
+    made_by: "Hergestellt von"
+  },
+  ch: {
+    0: "零",
+    1: "一",
+    2: "二",
+    3: "三",
+    4: "四",
+    5: "五",
+    6: "六",
+    7: "七",
+    8: "八",
+    9: "九",
+    am: "上午",
+    pm: "下午",
+    auto: "自动",
+    light: "明亮",
+    dark: "暗",
+    default: "默认",
+    cards: "卡片",
+    cogs: "齿轮",
+    cylinder: "圆柱",
+    memories: "回忆",
+    caterpillars: "毛毛虫",
+    photo: "照片",
+    words: "文字",
+    reset: "重置",
+    made_by: "制作"
+  },
+  gr: {
+    0: "μηδέν",
+    1: "ένα",
+    2: "δύο",
+    3: "τρία",
+    4: "τέσσερα",
+    5: "πέντε",
+    6: "έξι",
+    7: "επτά",
+    8: "οκτώ",
+    9: "εννέα",
+    am: "πμ",
+    pm: "μμ",
+    auto: "Αυτόματο",
+    light: "Φως",
+    dark: "Σκοτάδι",
+    default: "Προεπιλογή",
+    cards: "Κάρτες",
+    cogs: "Γρανάζια",
+    cylinder: "Κύλινδρος",
+    memories: "Αναμνήσεις",
+    caterpillars: "Προνύμφες",
+    photo: "Φωτογραφία",
+    words: "Λέξεις",
+    reset: "Επαναφορά",
+    made_by: "Κατασκευάστηκε από"
+  },
+  ar: {
+    0: "صفر",
+    1: "واحد",
+    2: "اثنان",
+    3: "ثلاثة",
+    4: "أربعة",
+    5: "خمسة",
+    6: "ستة",
+    7: "سبعة",
+    8: "ثمانية",
+    9: "تسعة",
+    am: "ص",
+    pm: "م",
+    auto: "تلقائي",
+    light: "فاتح",
+    dark: "داكن",
+    default: "افتراضي",
+    cards: "بطاقات",
+    cogs: "تروس",
+    cylinder: "أسطوانة",
+    memories: "ذكريات",
+    caterpillars: "يرقات",
+    photo: "صورة",
+    words: "كلمات",
+    reset: "إعادة تعيين",
+    made_by: "صنع بواسطة"
+  }
+};
 
 function randomIntFromInterval(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -36,6 +294,7 @@ const THEME_COLORS = {
   memories: "#ffffff",
   caterpillars: "#698744",
   photo: "#fd3622",
+  words: "#e65719",
 };
 
 function startTime() {
@@ -89,10 +348,7 @@ function startTime() {
     updateFavicon();
   }
 
-  if (
-    variantSelectEl.value === "photo" &&
-    (isNewMinute || forceUpdatePhoto)
-  ) {
+  if (variantSelectEl.value === "photo" && (isNewMinute || forceUpdatePhoto)) {
     document.documentElement.style.setProperty(
       "--background-image",
       `url("https://picsum.photos/seed/${newTime.join("")}${periodStr.trim()}/1294/965")`,
@@ -153,9 +409,15 @@ function setMemories() {
     );
 }
 
-function setTheme(newTheme: string) {
-  toggleThemeBtn.innerText = `${newTheme === "light" ? "Dark" : "Light"}`;
-  document.documentElement.dataset.theme = newTheme;
+function setTheme(newTheme: Theme) {
+  let theme = newTheme;
+
+  if (newTheme === "auto") {
+    const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    theme = isDarkMode ? "dark" : "light";
+  }
+
+  document.documentElement.dataset.theme = theme;
   localStorage.setItem("theme", newTheme);
 }
 
@@ -166,7 +428,7 @@ function setVariant(newVariant: string) {
 
   const color = THEME_COLORS[newVariant as keyof typeof THEME_COLORS];
 
-  if (color) {
+  if (color && Object.values(THEME_COLORS).includes(colorPickerEl.value)) {
     setColor(color);
   }
 
@@ -177,6 +439,8 @@ function setVariant(newVariant: string) {
   if (newVariant === "photo") {
     forceUpdatePhoto = true;
   }
+
+  setLocale(languageSelectEl.value as Language);
 }
 
 function hexToRgb(hex: string) {
@@ -219,16 +483,54 @@ function setColor(newColor: string) {
   }
 }
 
+function setWords(locale: Language = "en") {
+  document
+    .querySelectorAll<HTMLSpanElement>(".col.digit > span > span")
+    .forEach((n) => {
+      n.dataset.word = TRANSLATIONS[locale][n.textContent];
+    });
+}
+
+function setLocale(locale: Language) {
+  document.documentElement.dataset.locale = locale;
+  document.documentElement.dir = RTL_LOCALES.includes(locale) ? "rtl" : "ltr";
+
+  document.querySelectorAll<HTMLElement>("[data-text]").forEach((el) => {
+    const key = el.dataset.text;
+    if (key && TRANSLATIONS[locale][key]) {
+      el.textContent = TRANSLATIONS[locale][key];
+    }
+  });
+
+  localStorage.setItem("locale", locale);
+  setWords(locale);
+}
+
+function onMouseMove() {
+  const footer = document.querySelector<HTMLElement>('footer');
+  footer?.classList.remove('hidden');
+
+  clearTimeout(mouseTimeout);
+
+  mouseTimeout = window.setTimeout(() => {
+    if (!footer?.matches(':hover')) {
+      footer?.classList.add('hidden');
+    }
+  }, 3000);
+}
+
 function main() {
   const savedFormat = localStorage.getItem("format") || "24";
-  const savedTheme = localStorage.getItem("theme") || "light";
+  const savedTheme = (localStorage.getItem("theme") || "auto") as Theme;
   const savedVariant = localStorage.getItem("variant") || "default";
   const savedColor = localStorage.getItem("color") || "#ffaacc";
+  const savedLocale = (localStorage.getItem("locale") as Language) || "en";
 
   setFormat(savedFormat);
   setTheme(savedTheme);
   setVariant(savedVariant);
   setColor(savedColor);
+  setLocale(savedLocale);
 
   numbersCache.forEach((digit) => {
     digit.forEach((num) => {
@@ -242,9 +544,19 @@ function main() {
   startTime();
   setInterval(startTime, 1000);
 
-  toggleThemeBtn.addEventListener("click", () => {
-    const newTheme =
-      document.documentElement.dataset.theme === "light" ? "dark" : "light";
+  themeSelectEl.value = savedTheme;
+  languageSelectEl.value = savedLocale;
+
+  document.addEventListener('mousemove', onMouseMove);
+
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+    if (themeSelectEl.value === "auto") {
+      setTheme(e.matches ? "dark" : "light");
+    }
+  });
+
+  themeSelectEl.addEventListener("input", (e) => {
+    const newTheme = (e.target as HTMLSelectElement).value as Theme;
     setTheme(newTheme);
   });
 
@@ -271,6 +583,10 @@ function main() {
 
   colorPickerEl.addEventListener("input", (e) => {
     setColor((e.target as HTMLInputElement).value);
+  });
+
+  languageSelectEl.addEventListener("input", (e) => {
+    setLocale((e.target as HTMLSelectElement).value as Language);
   });
 }
 

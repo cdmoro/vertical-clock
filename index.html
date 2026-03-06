@@ -2,34 +2,25 @@
 <html lang="en" data-format="24" data-theme="light" data-variant="default">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vertical-clock</title>
+    <title>Vertical Clock</title>
   </head>
   <body>
-    <div class="actions">
-      <button id="toggle-format">Switch to 12-hour</button>
-      <button id="theme-btn">Use dark theme</button>
-      <select id="variant-select">
-        <option value="default">Default</option>
-        <option value="cards">Cards</option>
-        <option value="cogs">Cogs</option>
-        <option value="cylinder">Cylinder</option>
-        <option value="memories">Memories</option>
-        <option value="caterpillars">Caterpillars</option>
-        <option value="photo">Photo</option>
-      </select>
-      <div class="input-control color-control">
-        <input type="color" id="color-picker" value="#ffaacc" />
-        <button id="reset-color">Reset</button>
-      </div>
-    </div>
-
-    <div class="project">
-      <a href="https://github.com/cdmoro/vertical-clock/" id="github-link" target="_blank">GitHub</a>
-    </div>
-
     <div class="wrapper">
+      <div class="clock-bg">
+        <div class="col pos-1 digit-bg"></div>
+        <div class="col pos-2 digit-bg"></div>
+        <div class="spacer"></div>
+        <div class="col pos-3 digit-bg"></div>
+        <div class="col pos-4 digit-bg"></div>
+        <div class="spacer"></div>
+        <div class="col pos-5 digit-bg"></div>
+        <div class="col pos-6 digit-bg"></div>
+        <div class="spacer format-spacer"></div>
+        <div class="col pos-7 format format-bg"></div>
+      </div>
+
       <div class="clock">
         <div class="col digit">
           <span><span>0</span></span>
@@ -92,11 +83,58 @@
         </div>
         <div class="spacer format-spacer"></div>
         <div class="col format">
-          <span><span>AM</span></span>
-          <span><span>PM</span></span>
+          <span><span data-text="am">am</span></span>
+          <span><span data-text="pm">pm</span></span>
         </div>
       </div>
     </div>
+
+    <footer>
+      <div class="actions">
+        <button id="toggle-format">24</button>
+        <!-- <button id="theme-btn">Use dark theme</button> -->
+        <select id="theme-select">
+          <option value="auto" data-text="auto">Auto</option>
+          <option value="light" data-text="light">Light</option>
+          <option value="dark" data-text="dark">Dark</option>
+        </select>
+        <select id="variant-select">
+          <option value="default" data-text="default">Default</option>
+          <option value="cards" data-text="cards">Cards</option>
+          <option value="cogs" data-text="cogs">Cogs</option>
+          <option value="cylinder" data-text="cylinder">Cylinder</option>
+          <option value="memories" data-text="memories">Memories</option>
+          <option value="caterpillars" data-text="caterpillars">Caterpillars</option>
+          <option value="photo" data-text="photo">Photo</option>
+          <option value="words" data-text="words">Words</option>
+        </select>
+        <div class="input-control color-control">
+          <input type="color" id="color-picker" value="#ffaacc" />
+          <button id="reset-color" data-text="reset">Reset</button>
+        </div>
+        <select id="language-select">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="it">Italiano</option>
+          <option value="fr">Français</option>
+          <option value="pt">Português</option>
+          <option value="de">Deutsch</option>
+          <option value="ch">中文</option>
+          <option value="gr">Ελληνικά</option>
+          <option value="ar">العربية</option>
+        </select>
+      </div>
+      <div class="project">
+        <a
+          href="https://github.com/cdmoro/vertical-clock/"
+          id="github-link"
+          target="_blank"
+          >GitHub</a
+        > |
+        <span data-text="made_by">Made by</span> <a href="https://www.linkedin.com/in/cdbonadeo/" target="_blank">@CarlosBonadeo</a>
+      </div>
+    </footer>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
