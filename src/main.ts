@@ -8,6 +8,7 @@ const formats = document.querySelectorAll<HTMLSpanElement>(
 )!;
 const toggleFormatBtn =
   document.querySelector<HTMLButtonElement>("#toggle-format")!;
+const fullscreenBtn = document.querySelector<HTMLButtonElement>("#fullscreen-btn")!;
 const themeSelectEl = document.querySelector<HTMLSelectElement>("#theme-select")!;
 const variantSelectEl =
   document.querySelector<HTMLSelectElement>("#variant-select")!;
@@ -62,7 +63,8 @@ const TRANSLATIONS: NumberToWords = {
     photo: "Photo",
     words: "Words",
     reset: "Reset",
-    made_by: "Made by"
+    made_by: "Made by",
+    fullscreen: "Fullscreen"
   },
   es: {
     0: "cero",
@@ -77,10 +79,10 @@ const TRANSLATIONS: NumberToWords = {
     9: "nueve",
     am: "am",
     pm: "pm",
-    auto: "auto",
+    auto: "Auto",
     light: "Claro",
     dark: "Oscuro",
-    default: "Base",
+    default: "Predeterminado",
     cards: "Tarjetas",
     cogs: "Engranajes",
     cylinder: "Cilindro",
@@ -89,7 +91,8 @@ const TRANSLATIONS: NumberToWords = {
     photo: "Foto",
     words: "Palabras",
     reset: "Restablecer",
-    made_by: "Hecho por"
+    made_by: "Hecho por",
+    fullscreen: "Pantalla completa"
   },
   it:  {
     0: "zero",
@@ -116,7 +119,8 @@ const TRANSLATIONS: NumberToWords = {
     photo: "Foto",
     words: "Parole",
     reset: "Reimposta",
-    made_by: "Realizzato da"
+    made_by: "Realizzato da",
+    fullscreen: "Schermo intero"
   },
   fr: {
     0: "zéro",
@@ -143,7 +147,8 @@ const TRANSLATIONS: NumberToWords = {
     photo: "Photo",
     words: "Mots",
     reset: "Réinitialiser",
-    made_by: "Fait par"
+    made_by: "Fait par",
+    fullscreen: "Plein écran"
   },
   pt: {
     0: "zero",
@@ -170,7 +175,8 @@ const TRANSLATIONS: NumberToWords = {
     photo: "Foto",
     words: "Palavras",
     reset: "Redefinir",
-    made_by: "Feito por"
+    made_by: "Feito por",
+    fullscreen: "Tela cheia"
   },
   de: {
     0: "null",
@@ -197,7 +203,8 @@ const TRANSLATIONS: NumberToWords = {
     photo: "Foto",
     words: "Wörter",
     reset: "Zurücksetzen",
-    made_by: "Hergestellt von"
+    made_by: "Hergestellt von",
+    fullscreen: "Vollbild"
   },
   ch: {
     0: "零",
@@ -224,7 +231,8 @@ const TRANSLATIONS: NumberToWords = {
     photo: "照片",
     words: "文字",
     reset: "重置",
-    made_by: "制作"
+    made_by: "制作",
+    fullscreen: "全屏"
   },
   gr: {
     0: "μηδέν",
@@ -251,7 +259,8 @@ const TRANSLATIONS: NumberToWords = {
     photo: "Φωτογραφία",
     words: "Λέξεις",
     reset: "Επαναφορά",
-    made_by: "Κατασκευάστηκε από"
+    made_by: "Κατασκευάστηκε από",
+    fullscreen: "Πλήρης οθόνη"
   },
   ar: {
     0: "صفر",
@@ -278,7 +287,8 @@ const TRANSLATIONS: NumberToWords = {
     photo: "صورة",
     words: "كلمات",
     reset: "إعادة تعيين",
-    made_by: "صنع بواسطة"
+    made_by: "صنع بواسطة",
+    fullscreen: "ملء الشاشة"
   }
 };
 
@@ -519,6 +529,14 @@ function onMouseMove() {
   }, 3000);
 }
 
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
 function main() {
   const savedFormat = localStorage.getItem("format") || "24";
   const savedTheme = (localStorage.getItem("theme") || "auto") as Theme;
@@ -569,6 +587,8 @@ function main() {
 
     setFormat(newFormat);
   });
+
+  fullscreenBtn?.addEventListener('click', toggleFullscreen);
 
   resetColorBtn.addEventListener("click", () => {
     const theme = document.documentElement.dataset.variant || "default";

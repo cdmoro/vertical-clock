@@ -29,6 +29,7 @@ body {
   );
   color: var(--color);
   transition: background 0.5s ease;
+  overflow: hidden;
 }
 
 .wrapper {
@@ -57,32 +58,36 @@ body {
 
 footer {
   position: fixed;
-  padding: 1rem 0.5rem;
+  padding: 1rem;
   z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  width: calc(100vw - 1rem);
-  bottom: 0;
+  bottom: 1rem;
   transition: opacity 0.5s ease;
     background: color-mix(
     in srgb,
-    var(--background) 90%,
-    transparent 10%
+    var(--background) 80%,
+    transparent 20%
   );
+  left: 50%;
+  transform: translatex(-50%);
+  border-radius: 0.5rem;
 }
 
 footer .actions {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
 }
 
+footer .actions button {
+  white-space: nowrap;
+}
+
 footer .project {
-  display: flex;
-  gap: 0.5rem;
+  text-align: center;
   font-size: 0.8rem;
   font-family:
     system-ui,
@@ -940,6 +945,23 @@ footer .project a {
   :root {
     --clock-height: 50px;
     --digit-width: 40px;
+  }
+
+  footer {
+    width: calc(100vw - 4rem);
+    
+    .actions {
+      flex-wrap: wrap;
+    }
+    select {
+      width: 100px;
+    }
+
+    button {
+      max-width: 75px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   [data-variant="cards"] {
