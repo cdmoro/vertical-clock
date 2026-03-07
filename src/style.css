@@ -68,8 +68,8 @@ footer {
   transition: opacity 0.5s ease;
     background: color-mix(
     in srgb,
-    var(--accent-color) 10%,
-    var(--background) 90%
+    var(--background) 90%,
+    transparent 10%
   );
 }
 
